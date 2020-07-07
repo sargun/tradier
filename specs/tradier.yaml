@@ -135,6 +135,116 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/quotes"
+  /markets/options/chains:
+    get:
+      description: |
+        Get all quotes in an option chain. Greek and IV data is included courtesy of ORATS. Please check out their APIs for more in-depth options data.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: symbol
+          schema:
+            $ref: "#/components/schemas/symbol"
+          required: true
+        - in: query
+          name: expiration
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: greeks
+          schema:
+            type: boolean
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  options:
+                    type: object
+                    properties:
+                      option:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            symbol:
+                              type: string
+                            description:
+                              type: string
+                            exch:
+                              type: string
+                            last:
+                              type: number
+                            change:
+                              type: number
+                            volume:
+                              type: number
+                            open:
+                              type: number
+                            high:
+                              type: mnumber
+                            low:
+                              type: number
+                            close:
+                              type: number
+                            bid:
+                              type: number
+                            ask:
+                              type: number
+                            underlying:
+                              $ref: "#/components/schemas/symbol"
+                            strike:
+                              type: number
+                            change_percentage:
+                              type: number
+                            average_volume:
+                              type: number
+                            last_volume:
+                              type: number
+                            trade_date:
+                              type: number
+                            prevclose:
+                              type: number
+                            week_52_high:
+                              type: number
+                            week_52_low:
+                              type: number
+                            bidsize:
+                              type: number
+                            bidexch:
+                              type: string
+                            bid_date:
+                              type: number
+                              description: unix time
+                            asksize:
+                              type: number
+                            ask_date:
+                              type: number
+                            open_interest:
+                              type: number
+                            contract_size:
+                              type: number
+                            expiration_date:
+                              type: string
+                              format: date
+                            expiration_type:
+                              type: string
+                              enum: [standard, weeklys]
+                            option_type:
+                              type: string
+                              enum: [call, put]
+                            root_symbol:
+                              $ref: "#/components/schemas/symbol"
+                            greeks:
+                              # I give no fucks about the greeks
+                              type: object
+
   /markets/options/expirations:
     get:
       description: |
