@@ -342,7 +342,39 @@ paths:
                         items:
                           type: number
                           format: float
-
+  /markets/options/lookup:
+    get:
+      description: |
+        Get all options symbols for the given underlying. This will include additional option roots (ex. SPXW, RUTW) if applicable.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: underlying
+          schema:
+            type: string
+          required: true
+          description: Underlying symbol of the chain
+          # TODO: Determine format
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  symbols:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        rootSymbol:
+                          $ref: "#/components/schemas/symbol"
+                        options:
+                          type: array
+                          items:
+                            type: string
   /user/profile:
     get:
       description: |
