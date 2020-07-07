@@ -1,0 +1,265 @@
+openapi: 3.0.1
+info:
+  version: 'v1'
+  title: Tradier API
+# Added by API Auto Mocking Plugin
+servers:
+  - description: Tradier Sandbox
+    url: https://sandbox.tradier.com/v1
+components:
+  schemas:
+    quotes:
+      type: object
+      properties:
+        quotes:
+          type: object
+          properties:
+            quote:
+              type: array
+              items:
+                type: object
+                properties:
+                  symbol:
+                    $ref: "#/components/schemas/symbol"
+                  description:
+                    type: string
+                  exch:
+                    type: string
+                  last:
+                    type: number
+                    format: float
+                  change:
+                    type: number
+                  volume:
+                    type: number
+                  open:
+                    type: number
+                  high:
+                    type: number
+                  low:
+                    type: number
+                  close:
+                    type: number
+                  bid:
+                    type: number
+                  ask:
+                    type: number
+                  change_percentage:
+                    type: number
+                  average_volume:
+                    type: number
+                  last_volume:
+                    type: number
+                  trade_date:
+                    type: number
+                    description: Unix time of trade
+                  prevclose:
+                    type: number
+                  week_52_high:
+                    type: number
+                  week_52_low:
+                    type: number
+                  bidsize:
+                    type: number
+                  bidexch:
+                    type: string
+                  bid_date:
+                    type: number
+                    description: Unix time of bid
+                  asksize:
+                    type: number
+                  askexch:
+                    type: string
+                  ask_date:
+                    type: number
+                    description: Unix time of ask
+                  root_symbols:
+                    $ref: "#/components/schemas/symbol"
+    symbol:
+      type: string
+  securitySchemes:
+    BearerAuth:
+      scheme: bearer
+      type: http
+paths:
+  /markets/quotes:
+    post:
+      description: |
+        Get a list of symbols using a keyword lookup on the symbols description. Results are in descending order by average volume of the security. This can be used for simple search functions.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required: [symbols]
+              properties:
+                symbols:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/symbol"
+                greeks:
+                  default: false
+                  type: boolean
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/quotes"
+    get:
+      description: |
+        Get a list of symbols using a keyword lookup on the symbols description. Results are in descending order by average volume of the security. This can be used for simple search functions.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: symbols
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/symbol"
+          style: simple
+          explode: false
+        - in: query
+          name: greeks
+          schema:
+            type: boolean
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/quotes"
+  /markets/options/expirations:
+    get:
+      description: |
+        Get expiration dates for a particular underlying.
+
+        Note that some underlying securities use a different symbol for their weekly options (RUT/RUTW, SPX/SPXW). To make sure you see all expirations, make sure to send the includeAllRoots parameter. This will also ensure any unique options due to corporate actions (AAPL1) are returned.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: symbol
+          schema:
+            $ref: "#/components/schemas/symbol"
+          required: true
+          description: Underlying symbol of the chain
+        - in: query
+          name: includeAllRoots
+          schema:
+            type: boolean
+            default: false
+          required: false
+          description: Send expirations related to all option roots
+        - in: query
+          name: strikes
+          schema:
+            type: boolean
+            default: false
+          required: false
+
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [expirations]
+                properties:
+                  expirations:
+                    type: object
+                    properties:
+                      date:
+                        type: array
+                        items:
+                          type: string
+                          format: date
+                      expiration:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                            strikes:
+                              type: object
+                              properties:
+                                strike:
+                                  type: array
+                                  items:
+                                    type: number
+
+  /markets/options/strikes:
+    get:
+      description: |
+        Get an options strike prices for a specified expiration date.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: symbol
+          schema:
+            type: string
+          required: true
+          description: Underlying symbol of the chain
+          # TODO: Determine format
+        - in: query
+          name: expiration
+          schema:
+            type: string
+            format: date
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  strikes:
+                    type: object
+                    properties:
+                      strike:
+                        type: array
+                        items:
+                          type: number
+                          format: float
+
+  /user/profile:
+    get:
+      description: |
+        The user’s profile contains information pertaining to the user and his/her accounts. In addition to listing all the accounts a user has, this call should be used to create a personalized experience for your customers (i.e. displaying their name when they log in).
+      security:
+        - BearerAuth: []
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    type: object
+                    properties:
+                      account:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            account_number:
+                              type: string
+                            classification:
+                              type: string
+                            day_trader:
+                              type: boolean
+security:
+  - BearerAuth: []

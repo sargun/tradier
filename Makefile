@@ -1,0 +1,2 @@
+tradier: ./specs/tradier.yaml
+	openapi-generator generate -i ./specs/tradier.yaml -g python --package-name tradier -p generateSourceCodeOnly=true
