@@ -8,6 +8,118 @@ servers:
     url: https://sandbox.tradier.com/v1
 components:
   schemas:
+    streamingSummary:
+      type: object
+      properties:
+        high:
+          type: number
+        low:
+          type: number
+        open:
+          type: number
+        prevClose:
+          type: number
+        symbol:
+          $ref: '#/components/schema/symbol'
+        type:
+          type: string
+    streamingQuote:
+      type: object
+      properties:
+        ask:
+          type: number
+        askdate:
+          type: string
+          pattern: '^[0-9]+$'
+        askexch:
+          type: string
+        asksz:
+          type: number
+        bid:
+          type: number
+        biddate:
+          type: string
+          pattern: '^[0-9]+$'
+        bidexch:
+          type: string
+        symbol:
+          $ref: '#/components/schema/symbol'
+        type:
+          type: string
+    streamingTrade:
+      type: object
+      properties:
+        cvol:
+          type: string
+          pattern: '^[0-9]+$'
+        date:
+          type: string
+          pattern: '^[0-9]+$'
+        last:
+          type: string
+        price:
+          type: string
+        size:
+          type: string
+        symbol:
+          $ref: '#/components/schema/symbol'
+        exch:
+          type: string
+        type:
+          type: string
+    streamingTimesale:
+      type: object
+      properties:
+        symbol:
+          $ref: '#/components/schema/symbol'
+        exch:
+          type: string
+        bid:
+          type: string
+          pattern: '^[0-9]+$'
+        ask:
+          type: string
+          pattern: '^[0-9]+$'
+        last:
+          type: string
+          pattern: '^[0-9]+$'
+        size:
+          type: string
+          pattern: '^[0-9]+$'
+        date:
+          type: string
+          pattern: '^[0-9]+$'
+        seq:
+          type: number
+        flag:
+          type: string
+        cancel:
+          type: boolean
+        correction:
+          type: boolean
+        session:
+          type: string
+    streamingTradex:
+      type: object
+      properties:
+        cvol:
+          type: string
+          pattern: '^[0-9]+$'
+        date:
+          type: string
+          pattern: '^[0-9]+$'
+        last:
+          type: string
+        price:
+          type: string
+        size:
+          type: string
+        exch:
+          type: string
+        symbol:
+          $ref: '#/components/schema/symbol'
+        type:
+          type: string
     profile:
       '$ref': './profile.yaml'
     quote:
@@ -358,6 +470,7 @@ paths:
                       sessionid:
                         type: string
                         format: uuid
+
   /markets/history:
     get:
       description: |
