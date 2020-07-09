@@ -76,16 +76,16 @@ components:
           type: string
         bid:
           type: string
-          pattern: '^[0-9]+$'
+          format: number
         ask:
           type: string
-          pattern: '^[0-9]+$'
+          format: number
         last:
           type: string
-          pattern: '^[0-9]+$'
+          format: number
         size:
           type: string
-          pattern: '^[0-9]+$'
+          format: number
         date:
           type: string
           pattern: '^[0-9]+$'

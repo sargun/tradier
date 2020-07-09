@@ -1,6 +1,6 @@
 import tradier
 from pprint import pprint
-from tradier import streaming_client
+from tradier_python import streaming_client
 
 configuration = tradier.Configuration(
 	host = "https://api.tradier.com/v1",
