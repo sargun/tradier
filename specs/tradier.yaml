@@ -10,6 +10,8 @@ components:
   schemas:
     profile:
       '$ref': './profile.yaml'
+    quote:
+      '$ref': './quote.yaml'
     quotes:
       type: object
       properties:
@@ -19,66 +21,9 @@ components:
             quote:
               type: array
               items:
-                type: object
-                properties:
-                  symbol:
-                    $ref: "#/components/schemas/symbol"
-                  description:
-                    type: string
-                  exch:
-                    type: string
-                  last:
-                    type: number
-                    format: float
-                  change:
-                    type: number
-                  volume:
-                    type: number
-                  open:
-                    type: number
-                  high:
-                    type: number
-                  low:
-                    type: number
-                  close:
-                    type: number
-                  bid:
-                    type: number
-                  ask:
-                    type: number
-                  change_percentage:
-                    type: number
-                  average_volume:
-                    type: number
-                  last_volume:
-                    type: number
-                  trade_date:
-                    type: number
-                    description: Unix time of trade
-                  prevclose:
-                    type: number
-                  week_52_high:
-                    type: number
-                  week_52_low:
-                    type: number
-                  bidsize:
-                    type: number
-                  bidexch:
-                    type: string
-                  bid_date:
-                    type: number
-                    description: Unix time of bid
-                  asksize:
-                    type: number
-                  askexch:
-                    type: string
-                  ask_date:
-                    type: number
-                    description: Unix time of ask
-                  root_symbols:
-                    $ref: "#/components/schemas/symbol"
+                '$ref': '#/components/schemas/quote'
     symbol:
-      type: string
+      '$ref': './symbol.yaml'
   securitySchemes:
     BearerAuth:
       scheme: bearer
@@ -390,5 +335,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/profile'
+  /markets/events/session:
+    post:
+      description: |
+        Create a streaming session for use with the Tradier Streaming API. This session can be used with the streaming endpoints to obtain updates to the market as they happen.
+      security:
+        - BearerAuth: []
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stream:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        format: uri
+                      sessionid:
+                        type: string
+                        format: uuid
 security:
   - BearerAuth: []

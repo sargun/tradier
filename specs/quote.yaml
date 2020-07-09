@@ -1,0 +1,58 @@
+type: object
+properties:
+  symbol:
+    $ref: "./symbol.yaml"
+  description:
+    type: string
+  exch:
+    type: string
+  last:
+    type: number
+    format: float
+  change:
+    type: number
+  volume:
+    type: number
+  open:
+    type: number
+  high:
+    type: number
+  low:
+    type: number
+  close:
+    type: number
+  bid:
+    type: number
+  ask:
+    type: number
+  change_percentage:
+    type: number
+  average_volume:
+    type: number
+  last_volume:
+    type: number
+  trade_date:
+    type: number
+    description: Unix time of trade
+  prevclose:
+    type: number
+  week_52_high:
+    type: number
+  week_52_low:
+    type: number
+  bidsize:
+    type: number
+  bidexch:
+    type: string
+  bid_date:
+    type: number
+    description: Unix time of bid
+  asksize:
+    type: number
+  askexch:
+    type: string
+  ask_date:
+    type: number
+    description: Unix time of ask
+  root_symbols:
+    $ref: "./symbol.yaml"
