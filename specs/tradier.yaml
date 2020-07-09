@@ -358,5 +358,67 @@ paths:
                       sessionid:
                         type: string
                         format: uuid
+  /markets/history:
+    get:
+      description: |
+        Get historical pricing for a security. This data will usually cover the entire lifetime of the company if sending reasonable start/end times. You can fetch historical pricing for options by passing the OCC option symbol (ex. AAPL220617C00270000) as the symbol.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: symbol
+          schema:
+            $ref: '#/schema/components/symbol'
+          required: true
+        - in: query
+          name: interval
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+        - in: query
+          name: start
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: end
+          schema:
+            type: string
+            format: date
+      responses:
+        '2XX':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  history:
+                    type: object
+                    properties:
+                      day:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                              format: date
+                            open:
+                              type: number
+                              format: float
+                            high:
+                              type: number
+                              format: float
+                            low:
+                              type: number
+                              format: float
+                            close:
+                              type: number
+                              format: float
+                            volume:
+                              type: number
+                              format: int64
+
 security:
   - BearerAuth: []
