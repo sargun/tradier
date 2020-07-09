@@ -8,6 +8,8 @@ servers:
     url: https://sandbox.tradier.com/v1
 components:
   schemas:
+    profile:
+      '$ref': './profile.yaml'
     quotes:
       type: object
       properties:
@@ -188,7 +190,7 @@ paths:
                             open:
                               type: number
                             high:
-                              type: mnumber
+                              type: number
                             low:
                               type: number
                             close:
@@ -235,7 +237,7 @@ paths:
                               format: date
                             expiration_type:
                               type: string
-                              enum: [standard, weeklys]
+                              enum: [standard, weeklys, eom]
                             option_type:
                               type: string
                               enum: [call, put]
@@ -387,21 +389,6 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  profile:
-                    type: object
-                    properties:
-                      account:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            account_number:
-                              type: string
-                            classification:
-                              type: string
-                            day_trader:
-                              type: boolean
+                $ref: '#/components/schemas/profile'
 security:
   - BearerAuth: []

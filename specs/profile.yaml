@@ -1,0 +1,16 @@
+type: object
+properties:
+  profile:
+    type: object
+    properties:
+      account:
+        type: array
+        items:
+          type: object
+          properties:
+            account_number:
+              type: string
+            classification:
+              type: string
+            day_trader:
+              type: boolean
