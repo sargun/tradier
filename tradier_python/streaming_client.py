@@ -1,9 +1,9 @@
 # This code is manually written by Sargun!
 
 import requests, json
-from tradier import ApiClient
+from tradier_python import ApiClient
 
-from tradier.models import StreamingQuote, StreamingTrade, StreamingQuote, StreamingSummary, StreamingTradex, StreamingTimesale
+from tradier_python.models import StreamingQuote, StreamingTrade, StreamingQuote, StreamingSummary, StreamingTradex, StreamingTimesale
 handlers = {
 	'trade': StreamingTrade,
 	'quote': StreamingQuote,
