@@ -8,6 +8,123 @@ servers:
     url: https://sandbox.tradier.com/v1
 components:
   schemas:
+    option:
+      type: object
+      properties:
+        symbol:
+          type: string
+        description:
+          type: string
+        exch:
+          type: string
+        last:
+          type: number
+        change:
+          type: number
+        volume:
+          type: number
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        bid:
+          type: number
+        ask:
+          type: number
+        underlying:
+          $ref: "#/components/schemas/symbol"
+        strike:
+          type: number
+        change_percentage:
+          type: number
+        average_volume:
+          type: number
+        last_volume:
+          type: number
+        trade_date:
+          type: number
+        prevclose:
+          type: number
+        week_52_high:
+          type: number
+        week_52_low:
+          type: number
+        bidsize:
+          type: number
+        bidexch:
+          type: string
+        bid_date:
+          type: number
+          description: unix time
+        asksize:
+          type: number
+        ask_date:
+          type: number
+        open_interest:
+          type: number
+        contract_size:
+          type: number
+        expiration_date:
+          type: string
+          format: date
+        expiration_type:
+          type: string
+          enum: [standard, weeklys, eom]
+        option_type:
+          type: string
+          enum: [call, put]
+        root_symbol:
+          $ref: "#/components/schemas/symbol"
+        greeks:
+          type: object
+          properties:
+            delta:
+              type: number
+              format: double
+              description: Delta (Δ) represents the rate of change between the option's price and a $1 change in the underlying asset's price.
+            gamma:
+              type: number
+              format: double
+              description: Gamma (Γ) represents the rate of change between an option's delta and the underlying asset's price.
+            thetha:
+              type: number
+              format: double
+              description: Theta (Θ) represents the rate of change between the option price and time, or time sensitivity - sometimes known as an option's time decay.
+            vega:
+              type: number
+              format: double
+              description: Vega (v) represents the rate of change between an option's value and the underlying asset's implied volatility.
+            rho:
+              type: number
+              format: double
+              description: Rho (p) represents the rate of change between an option's value and a 1% change in the interest rate.
+            phi:
+              type: number
+              format: double
+              description: Phi indicates the expected change in the option premium due to a small change in the foreign currency interest rate.
+            bid_iv:
+              type: number
+              format: float
+              description: Bid implied volatility
+            mid_iv:
+              type: number
+              format: float
+              description: Mid implied volatility
+            ask_iv:
+              type: number
+              format: float
+              description: Ask implied volatility
+            smv_vol:
+              type: number
+              format: float
+              description: ORATS final implied volatility
+            updated_at:
+              type: string
+              format: date-time
     streamingSummary:
       type: object
       properties:
@@ -135,7 +252,7 @@ components:
               items:
                 '$ref': '#/components/schemas/quote'
     symbol:
-      '$ref': './symbol.yaml'
+      type: string
   securitySchemes:
     BearerAuth:
       scheme: bearer
@@ -230,79 +347,7 @@ paths:
                       option:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            symbol:
-                              type: string
-                            description:
-                              type: string
-                            exch:
-                              type: string
-                            last:
-                              type: number
-                            change:
-                              type: number
-                            volume:
-                              type: number
-                            open:
-                              type: number
-                            high:
-                              type: number
-                            low:
-                              type: number
-                            close:
-                              type: number
-                            bid:
-                              type: number
-                            ask:
-                              type: number
-                            underlying:
-                              $ref: "#/components/schemas/symbol"
-                            strike:
-                              type: number
-                            change_percentage:
-                              type: number
-                            average_volume:
-                              type: number
-                            last_volume:
-                              type: number
-                            trade_date:
-                              type: number
-                            prevclose:
-                              type: number
-                            week_52_high:
-                              type: number
-                            week_52_low:
-                              type: number
-                            bidsize:
-                              type: number
-                            bidexch:
-                              type: string
-                            bid_date:
-                              type: number
-                              description: unix time
-                            asksize:
-                              type: number
-                            ask_date:
-                              type: number
-                            open_interest:
-                              type: number
-                            contract_size:
-                              type: number
-                            expiration_date:
-                              type: string
-                              format: date
-                            expiration_type:
-                              type: string
-                              enum: [standard, weeklys, eom]
-                            option_type:
-                              type: string
-                              enum: [call, put]
-                            root_symbol:
-                              $ref: "#/components/schemas/symbol"
-                            greeks:
-                              # I give no fucks about the greeks
-                              type: object
+                          $ref: '#/components/schemas/option'
 
   /markets/options/expirations:
     get:

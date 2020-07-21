@@ -43,7 +43,8 @@ from tradier_python.models.inline_response2_xx5 import InlineResponse2XX5
 from tradier_python.models.inline_response2_xx5_history import InlineResponse2XX5History
 from tradier_python.models.inline_response2_xx5_history_day import InlineResponse2XX5HistoryDay
 from tradier_python.models.inline_response2_xx_options import InlineResponse2XXOptions
-from tradier_python.models.inline_response2_xx_options_option import InlineResponse2XXOptionsOption
+from tradier_python.models.option import Option
+from tradier_python.models.option_greeks import OptionGreeks
 from tradier_python.models.profile import Profile
 from tradier_python.models.profile_profile import ProfileProfile
 from tradier_python.models.profile_profile_account import ProfileProfileAccount

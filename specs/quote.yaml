@@ -1,11 +1,14 @@
 type: object
 properties:
   symbol:
-    $ref: "./symbol.yaml"
+    type: string
   description:
     type: string
   exch:
     type: string
+  type:
+    type: string
+    enum: [stock, option, etf, index, mutual_fund]
   last:
     type: number
     format: float
@@ -55,4 +58,24 @@ properties:
     type: number
     description: Unix time of ask
   root_symbols:
-    $ref: "./symbol.yaml"
+    type: string
+    description: Comma-delimited list of option root symbols for an underlier
+  root_symbol:
+    type: string
+  underlying:
+    type: string
+    description: Underlying security of the option (if applicable)
+  strike:
+    type: number
+  open_interest:
+    type: number
+  contract_size:
+    type: number
+  expiration_date:
+    type: string
+    format: date
+  expiration_type:
+    type: string
+  option_type:
+    type: string
+    enum: [put, call]

@@ -33,7 +33,7 @@ class InlineResponse2XXOptions(object):
                             and the value is json key in definition.
     """
     openapi_types = {
-        'option': 'list[InlineResponse2XXOptionsOption]'
+        'option': 'list[Option]'
     }
 
     attribute_map = {
@@ -58,7 +58,7 @@ class InlineResponse2XXOptions(object):
 
 
         :return: The option of this InlineResponse2XXOptions.  # noqa: E501
-        :rtype: list[InlineResponse2XXOptionsOption]
+        :rtype: list[Option]
         """
         return self._option
 
@@ -68,7 +68,7 @@ class InlineResponse2XXOptions(object):
 
 
         :param option: The option of this InlineResponse2XXOptions.  # noqa: E501
-        :type: list[InlineResponse2XXOptionsOption]
+        :type: list[Option]
         """
 
         self._option = option
