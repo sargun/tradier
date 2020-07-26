@@ -8,6 +8,8 @@ servers:
     url: https://sandbox.tradier.com/v1
 components:
   schemas:
+    symbol:
+      type: string
     option:
       type: object
       properties:
@@ -137,7 +139,7 @@ components:
         prevClose:
           type: number
         symbol:
-          $ref: '#/components/schema/symbol'
+          $ref: '#/components/schemas/symbol'
         type:
           type: string
     streamingQuote:
@@ -160,7 +162,7 @@ components:
         bidexch:
           type: string
         symbol:
-          $ref: '#/components/schema/symbol'
+          $ref: '#/components/schemas/symbol'
         type:
           type: string
     streamingTrade:
@@ -179,7 +181,7 @@ components:
         size:
           type: string
         symbol:
-          $ref: '#/components/schema/symbol'
+          $ref: '#/components/schemas/symbol'
         exch:
           type: string
         type:
@@ -188,7 +190,7 @@ components:
       type: object
       properties:
         symbol:
-          $ref: '#/components/schema/symbol'
+          $ref: '#/components/schemas/symbol'
         exch:
           type: string
         bid:
@@ -234,7 +236,7 @@ components:
         exch:
           type: string
         symbol:
-          $ref: '#/components/schema/symbol'
+          $ref: '#/components/schemas/symbol'
         type:
           type: string
     profile:
@@ -251,8 +253,6 @@ components:
               type: array
               items:
                 '$ref': '#/components/schemas/quote'
-    symbol:
-      type: string
   securitySchemes:
     BearerAuth:
       scheme: bearer
@@ -526,7 +526,7 @@ paths:
         - in: query
           name: symbol
           schema:
-            $ref: '#/schema/components/symbol'
+            $ref: '#/components/schemas/symbol'
           required: true
         - in: query
           name: interval
