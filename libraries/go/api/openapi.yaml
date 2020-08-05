@@ -1,0 +1,1294 @@
+openapi: 3.0.1
+info:
+  title: Tradier API
+  version: v1
+servers:
+- description: Tradier Sandbox
+  url: https://sandbox.tradier.com/v1
+security:
+- BearerAuth: []
+paths:
+  /markets/quotes:
+    get:
+      description: |
+        Get a list of symbols using a keyword lookup on the symbols description. Results are in descending order by average volume of the security. This can be used for simple search functions.
+      parameters:
+      - explode: false
+        in: query
+        name: symbols
+        required: true
+        schema:
+          items:
+            $ref: '#/components/schemas/symbol'
+          type: array
+        style: simple
+      - explode: true
+        in: query
+        name: greeks
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quotes'
+          description: OK
+      security:
+      - BearerAuth: []
+    post:
+      description: |
+        Get a list of symbols using a keyword lookup on the symbols description. Results are in descending order by average volume of the security. This can be used for simple search functions.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                symbols:
+                  items:
+                    $ref: '#/components/schemas/symbol'
+                  type: array
+                greeks:
+                  default: false
+                  type: boolean
+              required:
+              - symbols
+        required: true
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/quotes'
+          description: OK
+      security:
+      - BearerAuth: []
+  /markets/options/chains:
+    get:
+      description: |
+        Get all quotes in an option chain. Greek and IV data is included courtesy of ORATS. Please check out their APIs for more in-depth options data.
+      parameters:
+      - explode: true
+        in: query
+        name: symbol
+        required: true
+        schema:
+          $ref: '#/components/schemas/symbol'
+        style: form
+      - explode: true
+        in: query
+        name: expiration
+        required: true
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: greeks
+        required: false
+        schema:
+          type: boolean
+        style: form
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_2XX'
+          description: OK
+      security:
+      - BearerAuth: []
+  /markets/options/expirations:
+    get:
+      description: |
+        Get expiration dates for a particular underlying.
+
+        Note that some underlying securities use a different symbol for their weekly options (RUT/RUTW, SPX/SPXW). To make sure you see all expirations, make sure to send the includeAllRoots parameter. This will also ensure any unique options due to corporate actions (AAPL1) are returned.
+      parameters:
+      - description: Underlying symbol of the chain
+        explode: true
+        in: query
+        name: symbol
+        required: true
+        schema:
+          $ref: '#/components/schemas/symbol'
+        style: form
+      - description: Send expirations related to all option roots
+        explode: true
+        in: query
+        name: includeAllRoots
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - explode: true
+        in: query
+        name: strikes
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_2XX_1'
+          description: OK
+      security:
+      - BearerAuth: []
+  /markets/options/strikes:
+    get:
+      description: |
+        Get an options strike prices for a specified expiration date.
+      parameters:
+      - description: Underlying symbol of the chain
+        explode: true
+        in: query
+        name: symbol
+        required: true
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: expiration
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_2XX_2'
+          description: OK
+      security:
+      - BearerAuth: []
+  /markets/options/lookup:
+    get:
+      description: |
+        Get all options symbols for the given underlying. This will include additional option roots (ex. SPXW, RUTW) if applicable.
+      parameters:
+      - description: Underlying symbol of the chain
+        explode: true
+        in: query
+        name: underlying
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_2XX_3'
+          description: OK
+      security:
+      - BearerAuth: []
+  /user/profile:
+    get:
+      description: |
+        The user’s profile contains information pertaining to the user and his/her accounts. In addition to listing all the accounts a user has, this call should be used to create a personalized experience for your customers (i.e. displaying their name when they log in).
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/profile'
+          description: OK
+      security:
+      - BearerAuth: []
+  /markets/events/session:
+    post:
+      description: |
+        Create a streaming session for use with the Tradier Streaming API. This session can be used with the streaming endpoints to obtain updates to the market as they happen.
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_2XX_4'
+          description: OK
+      security:
+      - BearerAuth: []
+  /markets/history:
+    get:
+      description: |
+        Get historical pricing for a security. This data will usually cover the entire lifetime of the company if sending reasonable start/end times. You can fetch historical pricing for options by passing the OCC option symbol (ex. AAPL220617C00270000) as the symbol.
+      parameters:
+      - explode: true
+        in: query
+        name: symbol
+        required: true
+        schema:
+          $ref: '#/components/schemas/symbol'
+        style: form
+      - explode: true
+        in: query
+        name: interval
+        required: false
+        schema:
+          enum:
+          - daily
+          - weekly
+          - monthly
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: start
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: end
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "2XX":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_2XX_5'
+          description: OK
+      security:
+      - BearerAuth: []
+components:
+  schemas:
+    symbol:
+      type: string
+    option:
+      example:
+        symbol: symbol
+        description: description
+        open_interest: 9.369310271410669
+        ask_date: 9.965781217890562
+        greeks:
+          phi: 1.284659006116532
+          mid_iv: 6.778325
+          updated_at: 2000-01-23T04:56:07.000+00:00
+          thetha: 6.438423552598547
+          delta: 8.762042012749001
+          rho: 6.965117697638846
+          smv_vol: 5.9448957
+          gamma: 9.018348186070783
+          vega: 3.5571952270680973
+          bid_iv: 2.8841622
+          ask_iv: 6.878052
+        expiration_date: 2000-01-23
+        high: 5.637376656633329
+        last_volume: 1.2315135367772556
+        change_percentage: 4.145608029883936
+        low: 2.3021358869347655
+        bidexch: bidexch
+        average_volume: 7.386281948385884
+        close: 7.061401241503109
+        bid_date: 4.965218492984954
+        week_52_high: 6.84685269835264
+        last: 0.8008281904610115
+        option_type: call
+        change: 6.027456183070403
+        strike: 2.027123023002322
+        prevclose: 1.4894159098541704
+        week_52_low: 7.457744773683766
+        asksize: 5.025004791520295
+        underlying: underlying
+        trade_date: 1.0246457001441578
+        volume: 1.4658129805029452
+        expiration_type: standard
+        exch: exch
+        ask: 3.616076749251911
+        bidsize: 1.1730742509559433
+        root_symbol: root_symbol
+        contract_size: 6.683562403749608
+        bid: 9.301444243932576
+        open: 5.962133916683182
+      properties:
+        symbol:
+          type: string
+        description:
+          type: string
+        exch:
+          type: string
+        last:
+          type: number
+        change:
+          type: number
+        volume:
+          type: number
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        bid:
+          type: number
+        ask:
+          type: number
+        underlying:
+          type: string
+        strike:
+          type: number
+        change_percentage:
+          type: number
+        average_volume:
+          type: number
+        last_volume:
+          type: number
+        trade_date:
+          type: number
+        prevclose:
+          type: number
+        week_52_high:
+          type: number
+        week_52_low:
+          type: number
+        bidsize:
+          type: number
+        bidexch:
+          type: string
+        bid_date:
+          description: unix time
+          type: number
+        asksize:
+          type: number
+        ask_date:
+          type: number
+        open_interest:
+          type: number
+        contract_size:
+          type: number
+        expiration_date:
+          format: date
+          type: string
+        expiration_type:
+          enum:
+          - standard
+          - weeklys
+          - eom
+          type: string
+        option_type:
+          enum:
+          - call
+          - put
+          type: string
+        root_symbol:
+          type: string
+        greeks:
+          $ref: '#/components/schemas/option_greeks'
+      type: object
+    streamingSummary:
+      properties:
+        high:
+          type: number
+        low:
+          type: number
+        open:
+          type: number
+        prevClose:
+          type: number
+        symbol:
+          type: string
+        type:
+          type: string
+      type: object
+    streamingQuote:
+      properties:
+        ask:
+          type: number
+        askdate:
+          pattern: ^[0-9]+$
+          type: string
+        askexch:
+          type: string
+        asksz:
+          type: number
+        bid:
+          type: number
+        biddate:
+          pattern: ^[0-9]+$
+          type: string
+        bidexch:
+          type: string
+        symbol:
+          type: string
+        type:
+          type: string
+      type: object
+    streamingTrade:
+      properties:
+        cvol:
+          pattern: ^[0-9]+$
+          type: string
+        date:
+          pattern: ^[0-9]+$
+          type: string
+        last:
+          type: string
+        price:
+          type: string
+        size:
+          type: string
+        symbol:
+          type: string
+        exch:
+          type: string
+        type:
+          type: string
+      type: object
+    streamingTimesale:
+      properties:
+        symbol:
+          type: string
+        exch:
+          type: string
+        bid:
+          format: number
+          type: string
+        ask:
+          format: number
+          type: string
+        last:
+          format: number
+          type: string
+        size:
+          format: number
+          type: string
+        date:
+          pattern: ^[0-9]+$
+          type: string
+        seq:
+          type: number
+        flag:
+          type: string
+        cancel:
+          type: boolean
+        correction:
+          type: boolean
+        session:
+          type: string
+      type: object
+    streamingTradex:
+      properties:
+        cvol:
+          pattern: ^[0-9]+$
+          type: string
+        date:
+          pattern: ^[0-9]+$
+          type: string
+        last:
+          type: string
+        price:
+          type: string
+        size:
+          type: string
+        exch:
+          type: string
+        symbol:
+          type: string
+        type:
+          type: string
+      type: object
+    profile:
+      example:
+        profile:
+          account:
+          - account_number: account_number
+            day_trader: true
+            classification: classification
+          - account_number: account_number
+            day_trader: true
+            classification: classification
+      properties:
+        profile:
+          $ref: '#/components/schemas/profile_profile'
+      type: object
+    quote:
+      example:
+        symbol: symbol
+        description: description
+        open_interest: 9.369310271410669
+        ask_date: 5.025004791520295
+        type: stock
+        expiration_date: 2000-01-23
+        high: 5.637376656633329
+        last_volume: 7.386281948385884
+        change_percentage: 2.027123023002322
+        low: 2.3021358869347655
+        bidexch: bidexch
+        average_volume: 4.145608029883936
+        askexch: askexch
+        close: 7.061401241503109
+        bid_date: 1.1730742509559433
+        week_52_high: 1.4894159098541704
+        last: 0.8008282
+        option_type: put
+        change: 6.027456183070403
+        strike: 9.965781217890562
+        prevclose: 1.0246457001441578
+        week_52_low: 6.84685269835264
+        asksize: 4.965218492984954
+        underlying: underlying
+        trade_date: 1.2315135367772556
+        volume: 1.4658129805029452
+        expiration_type: expiration_type
+        exch: exch
+        ask: 3.616076749251911
+        bidsize: 7.457744773683766
+        root_symbol: root_symbol
+        root_symbols: root_symbols
+        contract_size: 6.683562403749608
+        bid: 9.301444243932576
+        open: 5.962133916683182
+      properties:
+        symbol:
+          type: string
+        description:
+          type: string
+        exch:
+          type: string
+        type:
+          enum:
+          - stock
+          - option
+          - etf
+          - index
+          - mutual_fund
+          type: string
+        last:
+          format: float
+          type: number
+        change:
+          type: number
+        volume:
+          type: number
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        bid:
+          type: number
+        ask:
+          type: number
+        change_percentage:
+          type: number
+        average_volume:
+          type: number
+        last_volume:
+          type: number
+        trade_date:
+          description: Unix time of trade
+          type: number
+        prevclose:
+          type: number
+        week_52_high:
+          type: number
+        week_52_low:
+          type: number
+        bidsize:
+          type: number
+        bidexch:
+          type: string
+        bid_date:
+          description: Unix time of bid
+          type: number
+        asksize:
+          type: number
+        askexch:
+          type: string
+        ask_date:
+          description: Unix time of ask
+          type: number
+        root_symbols:
+          description: Comma-delimited list of option root symbols for an underlier
+          type: string
+        root_symbol:
+          type: string
+        underlying:
+          description: Underlying security of the option (if applicable)
+          type: string
+        strike:
+          type: number
+        open_interest:
+          type: number
+        contract_size:
+          type: number
+        expiration_date:
+          format: date
+          type: string
+        expiration_type:
+          type: string
+        option_type:
+          enum:
+          - put
+          - call
+          type: string
+      type: object
+    quotes:
+      example:
+        quotes:
+          quote:
+          - symbol: symbol
+            description: description
+            open_interest: 9.369310271410669
+            ask_date: 5.025004791520295
+            type: stock
+            expiration_date: 2000-01-23
+            high: 5.637376656633329
+            last_volume: 7.386281948385884
+            change_percentage: 2.027123023002322
+            low: 2.3021358869347655
+            bidexch: bidexch
+            average_volume: 4.145608029883936
+            askexch: askexch
+            close: 7.061401241503109
+            bid_date: 1.1730742509559433
+            week_52_high: 1.4894159098541704
+            last: 0.8008282
+            option_type: put
+            change: 6.027456183070403
+            strike: 9.965781217890562
+            prevclose: 1.0246457001441578
+            week_52_low: 6.84685269835264
+            asksize: 4.965218492984954
+            underlying: underlying
+            trade_date: 1.2315135367772556
+            volume: 1.4658129805029452
+            expiration_type: expiration_type
+            exch: exch
+            ask: 3.616076749251911
+            bidsize: 7.457744773683766
+            root_symbol: root_symbol
+            root_symbols: root_symbols
+            contract_size: 6.683562403749608
+            bid: 9.301444243932576
+            open: 5.962133916683182
+          - symbol: symbol
+            description: description
+            open_interest: 9.369310271410669
+            ask_date: 5.025004791520295
+            type: stock
+            expiration_date: 2000-01-23
+            high: 5.637376656633329
+            last_volume: 7.386281948385884
+            change_percentage: 2.027123023002322
+            low: 2.3021358869347655
+            bidexch: bidexch
+            average_volume: 4.145608029883936
+            askexch: askexch
+            close: 7.061401241503109
+            bid_date: 1.1730742509559433
+            week_52_high: 1.4894159098541704
+            last: 0.8008282
+            option_type: put
+            change: 6.027456183070403
+            strike: 9.965781217890562
+            prevclose: 1.0246457001441578
+            week_52_low: 6.84685269835264
+            asksize: 4.965218492984954
+            underlying: underlying
+            trade_date: 1.2315135367772556
+            volume: 1.4658129805029452
+            expiration_type: expiration_type
+            exch: exch
+            ask: 3.616076749251911
+            bidsize: 7.457744773683766
+            root_symbol: root_symbol
+            root_symbols: root_symbols
+            contract_size: 6.683562403749608
+            bid: 9.301444243932576
+            open: 5.962133916683182
+      properties:
+        quotes:
+          $ref: '#/components/schemas/quotes_quotes'
+      type: object
+    inline_response_2XX_options:
+      example:
+        option:
+        - symbol: symbol
+          description: description
+          open_interest: 9.369310271410669
+          ask_date: 9.965781217890562
+          greeks:
+            phi: 1.284659006116532
+            mid_iv: 6.778325
+            updated_at: 2000-01-23T04:56:07.000+00:00
+            thetha: 6.438423552598547
+            delta: 8.762042012749001
+            rho: 6.965117697638846
+            smv_vol: 5.9448957
+            gamma: 9.018348186070783
+            vega: 3.5571952270680973
+            bid_iv: 2.8841622
+            ask_iv: 6.878052
+          expiration_date: 2000-01-23
+          high: 5.637376656633329
+          last_volume: 1.2315135367772556
+          change_percentage: 4.145608029883936
+          low: 2.3021358869347655
+          bidexch: bidexch
+          average_volume: 7.386281948385884
+          close: 7.061401241503109
+          bid_date: 4.965218492984954
+          week_52_high: 6.84685269835264
+          last: 0.8008281904610115
+          option_type: call
+          change: 6.027456183070403
+          strike: 2.027123023002322
+          prevclose: 1.4894159098541704
+          week_52_low: 7.457744773683766
+          asksize: 5.025004791520295
+          underlying: underlying
+          trade_date: 1.0246457001441578
+          volume: 1.4658129805029452
+          expiration_type: standard
+          exch: exch
+          ask: 3.616076749251911
+          bidsize: 1.1730742509559433
+          root_symbol: root_symbol
+          contract_size: 6.683562403749608
+          bid: 9.301444243932576
+          open: 5.962133916683182
+        - symbol: symbol
+          description: description
+          open_interest: 9.369310271410669
+          ask_date: 9.965781217890562
+          greeks:
+            phi: 1.284659006116532
+            mid_iv: 6.778325
+            updated_at: 2000-01-23T04:56:07.000+00:00
+            thetha: 6.438423552598547
+            delta: 8.762042012749001
+            rho: 6.965117697638846
+            smv_vol: 5.9448957
+            gamma: 9.018348186070783
+            vega: 3.5571952270680973
+            bid_iv: 2.8841622
+            ask_iv: 6.878052
+          expiration_date: 2000-01-23
+          high: 5.637376656633329
+          last_volume: 1.2315135367772556
+          change_percentage: 4.145608029883936
+          low: 2.3021358869347655
+          bidexch: bidexch
+          average_volume: 7.386281948385884
+          close: 7.061401241503109
+          bid_date: 4.965218492984954
+          week_52_high: 6.84685269835264
+          last: 0.8008281904610115
+          option_type: call
+          change: 6.027456183070403
+          strike: 2.027123023002322
+          prevclose: 1.4894159098541704
+          week_52_low: 7.457744773683766
+          asksize: 5.025004791520295
+          underlying: underlying
+          trade_date: 1.0246457001441578
+          volume: 1.4658129805029452
+          expiration_type: standard
+          exch: exch
+          ask: 3.616076749251911
+          bidsize: 1.1730742509559433
+          root_symbol: root_symbol
+          contract_size: 6.683562403749608
+          bid: 9.301444243932576
+          open: 5.962133916683182
+      properties:
+        option:
+          items:
+            $ref: '#/components/schemas/option'
+          type: array
+    inline_response_2XX:
+      example:
+        options:
+          option:
+          - symbol: symbol
+            description: description
+            open_interest: 9.369310271410669
+            ask_date: 9.965781217890562
+            greeks:
+              phi: 1.284659006116532
+              mid_iv: 6.778325
+              updated_at: 2000-01-23T04:56:07.000+00:00
+              thetha: 6.438423552598547
+              delta: 8.762042012749001
+              rho: 6.965117697638846
+              smv_vol: 5.9448957
+              gamma: 9.018348186070783
+              vega: 3.5571952270680973
+              bid_iv: 2.8841622
+              ask_iv: 6.878052
+            expiration_date: 2000-01-23
+            high: 5.637376656633329
+            last_volume: 1.2315135367772556
+            change_percentage: 4.145608029883936
+            low: 2.3021358869347655
+            bidexch: bidexch
+            average_volume: 7.386281948385884
+            close: 7.061401241503109
+            bid_date: 4.965218492984954
+            week_52_high: 6.84685269835264
+            last: 0.8008281904610115
+            option_type: call
+            change: 6.027456183070403
+            strike: 2.027123023002322
+            prevclose: 1.4894159098541704
+            week_52_low: 7.457744773683766
+            asksize: 5.025004791520295
+            underlying: underlying
+            trade_date: 1.0246457001441578
+            volume: 1.4658129805029452
+            expiration_type: standard
+            exch: exch
+            ask: 3.616076749251911
+            bidsize: 1.1730742509559433
+            root_symbol: root_symbol
+            contract_size: 6.683562403749608
+            bid: 9.301444243932576
+            open: 5.962133916683182
+          - symbol: symbol
+            description: description
+            open_interest: 9.369310271410669
+            ask_date: 9.965781217890562
+            greeks:
+              phi: 1.284659006116532
+              mid_iv: 6.778325
+              updated_at: 2000-01-23T04:56:07.000+00:00
+              thetha: 6.438423552598547
+              delta: 8.762042012749001
+              rho: 6.965117697638846
+              smv_vol: 5.9448957
+              gamma: 9.018348186070783
+              vega: 3.5571952270680973
+              bid_iv: 2.8841622
+              ask_iv: 6.878052
+            expiration_date: 2000-01-23
+            high: 5.637376656633329
+            last_volume: 1.2315135367772556
+            change_percentage: 4.145608029883936
+            low: 2.3021358869347655
+            bidexch: bidexch
+            average_volume: 7.386281948385884
+            close: 7.061401241503109
+            bid_date: 4.965218492984954
+            week_52_high: 6.84685269835264
+            last: 0.8008281904610115
+            option_type: call
+            change: 6.027456183070403
+            strike: 2.027123023002322
+            prevclose: 1.4894159098541704
+            week_52_low: 7.457744773683766
+            asksize: 5.025004791520295
+            underlying: underlying
+            trade_date: 1.0246457001441578
+            volume: 1.4658129805029452
+            expiration_type: standard
+            exch: exch
+            ask: 3.616076749251911
+            bidsize: 1.1730742509559433
+            root_symbol: root_symbol
+            contract_size: 6.683562403749608
+            bid: 9.301444243932576
+            open: 5.962133916683182
+      properties:
+        options:
+          $ref: '#/components/schemas/inline_response_2XX_options'
+    inline_response_2XX_1_expirations_strikes:
+      example:
+        strike:
+        - 0.8008281904610115
+        - 0.8008281904610115
+      properties:
+        strike:
+          items:
+            type: number
+          type: array
+    inline_response_2XX_1_expirations_expiration:
+      example:
+        date: 2000-01-23
+        strikes:
+          strike:
+          - 0.8008281904610115
+          - 0.8008281904610115
+      properties:
+        date:
+          format: date
+          type: string
+        strikes:
+          $ref: '#/components/schemas/inline_response_2XX_1_expirations_strikes'
+    inline_response_2XX_1_expirations:
+      example:
+        date:
+        - 2000-01-23
+        - 2000-01-23
+        expiration:
+        - date: 2000-01-23
+          strikes:
+            strike:
+            - 0.8008281904610115
+            - 0.8008281904610115
+        - date: 2000-01-23
+          strikes:
+            strike:
+            - 0.8008281904610115
+            - 0.8008281904610115
+      properties:
+        date:
+          items:
+            format: date
+            type: string
+          type: array
+        expiration:
+          items:
+            $ref: '#/components/schemas/inline_response_2XX_1_expirations_expiration'
+          type: array
+    inline_response_2XX_1:
+      example:
+        expirations:
+          date:
+          - 2000-01-23
+          - 2000-01-23
+          expiration:
+          - date: 2000-01-23
+            strikes:
+              strike:
+              - 0.8008281904610115
+              - 0.8008281904610115
+          - date: 2000-01-23
+            strikes:
+              strike:
+              - 0.8008281904610115
+              - 0.8008281904610115
+      properties:
+        expirations:
+          $ref: '#/components/schemas/inline_response_2XX_1_expirations'
+      required:
+      - expirations
+    inline_response_2XX_2_strikes:
+      example:
+        strike:
+        - 0.8008282
+        - 0.8008282
+      properties:
+        strike:
+          items:
+            format: float
+            type: number
+          type: array
+    inline_response_2XX_2:
+      example:
+        strikes:
+          strike:
+          - 0.8008282
+          - 0.8008282
+      properties:
+        strikes:
+          $ref: '#/components/schemas/inline_response_2XX_2_strikes'
+    inline_response_2XX_3_symbols:
+      example:
+        options:
+        - options
+        - options
+        rootSymbol: rootSymbol
+      properties:
+        rootSymbol:
+          type: string
+        options:
+          items:
+            type: string
+          type: array
+    inline_response_2XX_3:
+      example:
+        symbols:
+        - options:
+          - options
+          - options
+          rootSymbol: rootSymbol
+        - options:
+          - options
+          - options
+          rootSymbol: rootSymbol
+      properties:
+        symbols:
+          items:
+            $ref: '#/components/schemas/inline_response_2XX_3_symbols'
+          type: array
+    inline_response_2XX_4_stream:
+      example:
+        sessionid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        url: https://openapi-generator.tech
+      properties:
+        url:
+          format: uri
+          type: string
+        sessionid:
+          format: uuid
+          type: string
+    inline_response_2XX_4:
+      example:
+        stream:
+          sessionid: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          url: https://openapi-generator.tech
+      properties:
+        stream:
+          $ref: '#/components/schemas/inline_response_2XX_4_stream'
+    inline_response_2XX_5_history_day:
+      example:
+        date: 2000-01-23
+        volume: 5.637376656633329
+        high: 6.0274563
+        low: 1.4658129
+        close: 5.962134
+        open: 0.8008282
+      properties:
+        date:
+          format: date
+          type: string
+        open:
+          format: float
+          type: number
+        high:
+          format: float
+          type: number
+        low:
+          format: float
+          type: number
+        close:
+          format: float
+          type: number
+        volume:
+          format: int64
+          type: number
+    inline_response_2XX_5_history:
+      example:
+        day:
+        - date: 2000-01-23
+          volume: 5.637376656633329
+          high: 6.0274563
+          low: 1.4658129
+          close: 5.962134
+          open: 0.8008282
+        - date: 2000-01-23
+          volume: 5.637376656633329
+          high: 6.0274563
+          low: 1.4658129
+          close: 5.962134
+          open: 0.8008282
+      properties:
+        day:
+          items:
+            $ref: '#/components/schemas/inline_response_2XX_5_history_day'
+          type: array
+    inline_response_2XX_5:
+      example:
+        history:
+          day:
+          - date: 2000-01-23
+            volume: 5.637376656633329
+            high: 6.0274563
+            low: 1.4658129
+            close: 5.962134
+            open: 0.8008282
+          - date: 2000-01-23
+            volume: 5.637376656633329
+            high: 6.0274563
+            low: 1.4658129
+            close: 5.962134
+            open: 0.8008282
+      properties:
+        history:
+          $ref: '#/components/schemas/inline_response_2XX_5_history'
+    option_greeks:
+      example:
+        phi: 1.284659006116532
+        mid_iv: 6.778325
+        updated_at: 2000-01-23T04:56:07.000+00:00
+        thetha: 6.438423552598547
+        delta: 8.762042012749001
+        rho: 6.965117697638846
+        smv_vol: 5.9448957
+        gamma: 9.018348186070783
+        vega: 3.5571952270680973
+        bid_iv: 2.8841622
+        ask_iv: 6.878052
+      properties:
+        delta:
+          description: Delta (Δ) represents the rate of change between the option's
+            price and a $1 change in the underlying asset's price.
+          format: double
+          type: number
+        gamma:
+          description: Gamma (Γ) represents the rate of change between an option's
+            delta and the underlying asset's price.
+          format: double
+          type: number
+        thetha:
+          description: Theta (Θ) represents the rate of change between the option
+            price and time, or time sensitivity - sometimes known as an option's time
+            decay.
+          format: double
+          type: number
+        vega:
+          description: Vega (v) represents the rate of change between an option's
+            value and the underlying asset's implied volatility.
+          format: double
+          type: number
+        rho:
+          description: Rho (p) represents the rate of change between an option's value
+            and a 1% change in the interest rate.
+          format: double
+          type: number
+        phi:
+          description: Phi indicates the expected change in the option premium due
+            to a small change in the foreign currency interest rate.
+          format: double
+          type: number
+        bid_iv:
+          description: Bid implied volatility
+          format: float
+          type: number
+        mid_iv:
+          description: Mid implied volatility
+          format: float
+          type: number
+        ask_iv:
+          description: Ask implied volatility
+          format: float
+          type: number
+        smv_vol:
+          description: ORATS final implied volatility
+          format: float
+          type: number
+        updated_at:
+          format: date-time
+          type: string
+    profile_profile_account:
+      example:
+        account_number: account_number
+        day_trader: true
+        classification: classification
+      properties:
+        account_number:
+          type: string
+        classification:
+          type: string
+        day_trader:
+          type: boolean
+    profile_profile:
+      example:
+        account:
+        - account_number: account_number
+          day_trader: true
+          classification: classification
+        - account_number: account_number
+          day_trader: true
+          classification: classification
+      properties:
+        account:
+          items:
+            $ref: '#/components/schemas/profile_profile_account'
+          type: array
+    quotes_quotes:
+      example:
+        quote:
+        - symbol: symbol
+          description: description
+          open_interest: 9.369310271410669
+          ask_date: 5.025004791520295
+          type: stock
+          expiration_date: 2000-01-23
+          high: 5.637376656633329
+          last_volume: 7.386281948385884
+          change_percentage: 2.027123023002322
+          low: 2.3021358869347655
+          bidexch: bidexch
+          average_volume: 4.145608029883936
+          askexch: askexch
+          close: 7.061401241503109
+          bid_date: 1.1730742509559433
+          week_52_high: 1.4894159098541704
+          last: 0.8008282
+          option_type: put
+          change: 6.027456183070403
+          strike: 9.965781217890562
+          prevclose: 1.0246457001441578
+          week_52_low: 6.84685269835264
+          asksize: 4.965218492984954
+          underlying: underlying
+          trade_date: 1.2315135367772556
+          volume: 1.4658129805029452
+          expiration_type: expiration_type
+          exch: exch
+          ask: 3.616076749251911
+          bidsize: 7.457744773683766
+          root_symbol: root_symbol
+          root_symbols: root_symbols
+          contract_size: 6.683562403749608
+          bid: 9.301444243932576
+          open: 5.962133916683182
+        - symbol: symbol
+          description: description
+          open_interest: 9.369310271410669
+          ask_date: 5.025004791520295
+          type: stock
+          expiration_date: 2000-01-23
+          high: 5.637376656633329
+          last_volume: 7.386281948385884
+          change_percentage: 2.027123023002322
+          low: 2.3021358869347655
+          bidexch: bidexch
+          average_volume: 4.145608029883936
+          askexch: askexch
+          close: 7.061401241503109
+          bid_date: 1.1730742509559433
+          week_52_high: 1.4894159098541704
+          last: 0.8008282
+          option_type: put
+          change: 6.027456183070403
+          strike: 9.965781217890562
+          prevclose: 1.0246457001441578
+          week_52_low: 6.84685269835264
+          asksize: 4.965218492984954
+          underlying: underlying
+          trade_date: 1.2315135367772556
+          volume: 1.4658129805029452
+          expiration_type: expiration_type
+          exch: exch
+          ask: 3.616076749251911
+          bidsize: 7.457744773683766
+          root_symbol: root_symbol
+          root_symbols: root_symbols
+          contract_size: 6.683562403749608
+          bid: 9.301444243932576
+          open: 5.962133916683182
+      properties:
+        quote:
+          items:
+            $ref: '#/components/schemas/quote'
+          type: array
+  securitySchemes:
+    BearerAuth:
+      scheme: bearer
+      type: http
